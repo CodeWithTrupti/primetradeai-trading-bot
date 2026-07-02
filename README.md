@@ -7,7 +7,9 @@ summaries and responses, and logs every request/response/error to a file.
 
 ## Features
 
-- Order types: **MARKET**, **LIMIT**, and **STOP** (stop-limit) — the bonus third type.
+- Order types: **MARKET**, **LIMIT**, and **STOP** (stop-limit) — bonus third type.
+- **Interactive mode** — a guided, menu-driven prompt flow with per-field
+  validation and re-prompts (bonus: enhanced CLI UX).
 - Both sides: **BUY** and **SELL**.
 - CLI input validation (symbol, side, type, quantity, price rules).
 - Clear output: request summary → order response (`orderId`, `status`,
@@ -97,6 +99,31 @@ python cli.py BTCUSDT BUY STOP 0.001 --price 66000 --stop-price 65500
 
 # Validate without hitting the API (no keys needed)
 python cli.py BTCUSDT BUY MARKET 0.001 --dry-run
+```
+
+### Interactive mode
+
+Run with no arguments (or `-i` / `--interactive`) for a guided flow that prompts
+for each field, validates immediately, and re-prompts on bad input:
+
+```bash
+python cli.py            # or:  python cli.py --interactive
+```
+
+```
+=== Binance Futures Testnet - Interactive Order Entry ===
+Symbol (e.g. BTCUSDT): BTCUSDT
+Side:
+  1) BUY
+  2) SELL
+  Select (number or name): 1
+Order type:
+  1) MARKET
+  2) LIMIT
+  3) STOP
+  Select (number or name): 1
+Quantity: 0.001
+Dry run? (validate only, no API call) [y/N]: n
 ```
 
 ### Example output

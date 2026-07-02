@@ -19,6 +19,7 @@ from bot.client import (
     BinanceClientError,
     BinanceFuturesClient,
 )
+from bot.interactive import prompt_order
 from bot.logging_config import get_logger
 from bot.orders import build_order_params, place_order
 from bot.validators import ValidationError, validate_order
@@ -34,6 +35,12 @@ def parse_args(argv=None) -> argparse.Namespace:
         "Binance USDT-M Futures Testnet.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
+    )
+    parser.add_argument(
+        "-i",
+        "--interactive",
+        action="store_true",
+        help="Guided prompt mode (also the default when run with no arguments)",
     )
     parser.add_argument("symbol", help="Trading pair, e.g. BTCUSDT")
     parser.add_argument("side", help="BUY or SELL")
@@ -132,7 +139,19 @@ def run(args: argparse.Namespace) -> int:
 
 def main(argv=None) -> int:
     load_dotenv()
-    args = parse_args(argv)
+    if argv is None:
+        argv = sys.argv[1:]
+
+    # No arguments, or an explicit -i/--interactive flag → guided prompt mode.
+    if not argv or "-i" in argv or "--interactive" in argv:
+        try:
+            args = prompt_order()
+        except (KeyboardInterrupt, EOFError):
+            print("\nCancelled.")
+            return 0
+    else:
+        args = parse_args(argv)
+
     try:
         return run(args)
     except ValidationError as exc:
