@@ -157,7 +157,10 @@ python cli.py BTCUSDT SELL LIMIT  0.001 --price 50000
 ```
 
 The log records each request (params, with secret/signature redacted), the raw
-Binance response, and any errors.
+Binance response, and any errors. The committed `logs/trading_bot.log` currently
+contains `--dry-run` entries that demonstrate the logging format; live-order
+entries append below them once credentials are configured (see the note on
+Binance's testnet migration under *Assumptions* below).
 
 ## Running the tests
 
@@ -182,7 +185,15 @@ no network access.
 ## Assumptions & notes
 
 - **Testnet only.** The base URL defaults to `https://testnet.binancefuture.com`
-  and can be overridden with `BINANCE_BASE_URL`.
+  (the URL specified in the task) and can be overridden with `BINANCE_BASE_URL`.
+- **Binance testnet migration (2026).** Binance has migrated the Futures Testnet:
+  `testnet.binancefuture.com` now redirects to the *Demo Trading* site
+  (`demo.binance.com`), and the current REST endpoint for signed API calls is
+  `https://demo-fapi.binance.com`. To run live orders against the new endpoint,
+  set `BINANCE_BASE_URL=https://demo-fapi.binance.com` in your `.env` and create
+  a Demo Trading API key from the profile menu on `demo.binance.com`. The code
+  keeps the task-specified default and simply swaps the base URL via config —
+  no code change needed.
 - The account must hold testnet USDT margin; testnet balances reset periodically.
 - `quantity` and `price` must satisfy each symbol's lot-size / tick-size and
   minimum-notional filters, or Binance rejects the order (surfaced as a clear
